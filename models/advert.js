@@ -3,16 +3,23 @@ import { Schema, model } from "mongoose";
 const advertSchema = new Schema({
     title: { type: String, required: true },
 
-    description: { type: String },
+    description: { type: String, required: true },
 
-    category: { type: String },
+    imageURL: { type: String }, 
 
-    price: { type: Number },
+    price: { type: Number, required: true },
 
-    imageUrl: { type: String },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, 
 
-    vendor: { type:Schema.Types.ObjectId, ref: 'User' }
+    organizer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
+
+    location: { type: String, required: true },
+
+    date: { type: Date, required: true },
+
+    attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] 
 });
+
 
 
 export const Advert = model('Advert', advertSchema);
