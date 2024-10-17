@@ -1,70 +1,58 @@
 import { Advert } from "../models/advert.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { createAdvertValidator, updateAdvertValidator } from "../validators/advert.js";
 
-const createAdvert = async (req, res, next) => {
+export const createAdvert = async (req, res, next) => {
     try {
-        const { title, description, category, price } = req.body;
-        const imageUrl = req.file ? req.file.path : null;
+      const { error, value } = createAdvertValidator.validate(req.body);
+      if (error) {
+        return res.status(422).json({ error: 'Validation failed', details: error });
+      }
+  
+      const advert = await Advert.findOne({ title: value.title });
+      if (advert) {
+        return res.status(409).json({ error: 'Advert with this title already exists' });
+      }
+  
+      const hashedPassword = await bcrypt.hash(value.password, 10);
+      const createdAdvert = await Advert.create({
+        ...value,
+        password: hashedPassword
+      });
+  
+      res.json({ message: 'Advert created successfully', data: createdAdvert });
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  };
 
+    export const getAllAdverts = async (req, res, next) => {
+       try {
+        const adverts = await Advert
+        .find(JSON.parse(filter))
+        .limit(limit)
+        .skip(skip)
+         res.status(200).json(adverts);
+       } catch (error) {
+        next(error);
+       }
+    }
+
+    export const updateAdvert = async (req, res, next) => {
         try {
-            const advert = new Advert({
-                title,
-                description,
-                category,
-                price,
-                imageUrl,
-                vendor: req.user.id
-            });
-            await advert.save();
-            res.status(201).json(advert);
+            const { error, value } = updateAdvertValidator.validate(req.body);
+            if (error) {
+                return res.status(422).json({ error: 'Validation failed', details: error });
+            }
+            const advert = await Advert.findOne({ title: value.title });
+            if (!advert) {
+                return res.status(404).json({ error: 'Advert not found' });
+            }
+            const updatedAdvert = await Advert.findByIdAndUpdate(advert._id, value, { new: true });
+            res.json({ message: 'Advert updated successfully', data: updatedAdvert });
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            next(error);
         }
-    } catch (error) {
-        next(error);
     }
-};
-
-export const getAllAdverts = async (req, res, next) => {
-    try {
-        const books = await Advert.find();
-        res.status(200).json(adverts);
-    } catch (error) {
-        next(error);
-    }
-};
-
-// Update an advert
-const updateAdvert = async (req, res, next) => {
-    const { id } = req.params;
-    const advert = await Advert.findById(id);
-
-    if (!advert) return res.status(404).json({ error: 'Advert not found' });
-
-    if (advert.vendor.toString() !== req.user.id) return res.status(403).json({ error: 'Unauthorized' });
-
-    try {
-        const updatedAdvert = await Advert.findByIdAndUpdate(id, req.body, { new: true });
-        res.json(updatedAdvert);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-// Delete an advert
-const deleteAdvert = async (req, res) => {
-    const { id } = req.params;
-    const advert = await Advert.findById(id);
-
-    if (!advert) return res.status(404).json({ error: 'Advert not found' });
-
-    if (advert.vendor.toString() !== req.user.id) return res.status(403).json({ error: 'Unauthorized' });
-
-    try {
-        await advert.remove();
-        res.json({ message: 'Advert removed successfully' });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
-
-
