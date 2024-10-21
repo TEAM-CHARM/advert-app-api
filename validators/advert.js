@@ -9,7 +9,7 @@ import Joi from "joi";
     organizer: Joi.string().required(),
     location: Joi.string().required(),
     date: Joi.date().required(),
-    attendees: Joi.array().items(Joi.string()).required(),
+    attendees: Joi.array().items(Joi.string()),
   });
 
   export const updateAdvertValidator = Joi.object({
