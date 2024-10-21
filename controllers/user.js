@@ -58,12 +58,13 @@ export const loginUser = async (req, res, next) => {
     });
     const response = {
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        vendor: user.vendor,
-      }
+      user
+      // : {
+      //   id: user._id,
+      //   name: user.name,
+      //   email: user.email,
+      //   role: user.role,
+      // }
     };
     res.status(200).json(response);
   } catch (error) {
