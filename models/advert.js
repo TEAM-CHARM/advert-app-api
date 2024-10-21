@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 
+
 const advertSchema = new Schema({
     title: { type: String, required: true },
 
@@ -9,15 +10,15 @@ const advertSchema = new Schema({
 
     price: { type: Number, required: true },
 
-    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }, 
+    category: { type: Schema.Types.ObjectId, ref: 'Category', required: true }, 
 
-    organizer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
+    organizer: { type: Schema.Types.ObjectId, ref: 'User', required: true }, 
 
     location: { type: String, required: true },
 
     date: { type: Date, required: true },
 
-    attendees: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] 
+    attendees: [{ type: Schema.Types.ObjectId, ref: 'User' }] 
 });
 
 
