@@ -8,7 +8,11 @@ const userSchema = new Schema({
 
     password: { type: String, required: true },
 
-    role: { type: String, enum: ['vendor', 'user'] }
+    role: { type: String, enum: ['vendor', 'user'] },
+
+    bio: { type: String },
+
+    profilePic: { type: String },
 }, {
   toJSON: {
     versionKey: false, // exclude __v field
