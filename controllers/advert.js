@@ -40,6 +40,18 @@ export const createAdvert = async (req, res, next) => {
        }
     }
 
+    export const getAdvert = async (req, res, next) => {
+        try {
+            const advert = await Advert.findById(req.params.id);
+            if (!advert) {
+                return res.status(404).json({ error: 'Advert not found' });
+            }
+            res.json(advert);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     export const updateAdvert = async (req, res, next) => {
         try {
             const { error, value } = updateAdvertValidator.validate(req.body);
@@ -52,6 +64,18 @@ export const createAdvert = async (req, res, next) => {
             }
             const updatedAdvert = await Advert.findByIdAndUpdate(advert._id, value, { new: true });
             res.json({ message: 'Advert updated successfully', data: updatedAdvert });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    export const deleteAdvert = async (req, res, next) => {
+        try {
+            const advert = await Advert.findByIdAndDelete(req.params.id);
+            if (!advert) {
+                return res.status(404).json({ error: 'Advert not found' });
+            }
+            res.json({ message: 'Advert deleted successfully' });
         } catch (error) {
             next(error);
         }
