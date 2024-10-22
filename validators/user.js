@@ -19,7 +19,7 @@ export const updateUserValidator = Joi.object({
     name: Joi.string().optional(),
     email: Joi.string().optional(),
     password: Joi.string().optional(),
-    role: Joi.string().optional(),
+    role: Joi.string().optional().valid("vendor", "user"),
     avatar: Joi.string().optional(),
     businessName: Joi.string().optional(),
     businessEmail: Joi.string().optional(),
