@@ -67,12 +67,6 @@ export const loginUser = async (req, res, next) => {
     const response = {
       token,
       user
-      // : {
-      //   id: user._id,
-      //   name: user.name,
-      //   email: user.email,
-      //   role: user.role,
-      // }
     };
     res.status(200).json(response);
   } catch (error) {
@@ -102,8 +96,16 @@ export const updateProfile = async (req, res, next) => {
       return res.status(422).json({ error: 'Validation failed', details: error.details });
     }
 
-    await User.findByIdAndUpdate(req.auth.id, value);
-    res.status(200).json({ message: 'Profile updated successfully' });
+    const user = await User.findByIdAndUpdate(req.auth.id, value, { new: true });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+    const response = {
+      token,
+      user
+    };
+    res.status(200).json(response);
 
   } catch (error) {
     next(error);
