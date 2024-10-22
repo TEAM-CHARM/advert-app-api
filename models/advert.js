@@ -1,4 +1,6 @@
 import { Schema, model } from "mongoose";
+import { toJSON } from "@reis/mongoose-to-json";
+
 
 
 const advertSchema = new Schema({
@@ -6,7 +8,7 @@ const advertSchema = new Schema({
 
     description: { type: String, required: true },
 
-    imageURL: { type: String }, 
+    imageURL: { type: String,required:true }, 
 
     price: { type: Number, required: true },
 
@@ -22,5 +24,6 @@ const advertSchema = new Schema({
 });
 
 
+advertSchema.plugin(toJSON);
 
 export const Advert = model('Advert', advertSchema);
