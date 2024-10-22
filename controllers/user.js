@@ -112,6 +112,58 @@ export const updateProfile = async (req, res, next) => {
   }
 };
 
+export const followVendor = async (req, res, next) => {
+  const followerId = req.auth.id;
+  const vendorId = req.body.vendorId;
+  try {
+    const vendor = await User.findOneAndUpdate(vendorId, ); //find the vendor to be followed
+
+    // check if the user is already following the vendor
+    const isFollowing = await User.findOne({
+      $and: [
+        { $or: [{ followers: followerId }, ] },
+        // { $or: [{ followers: vendorId },] },
+      ],
+    });
+
+    if (isFollowing) {
+      // remove the user from the following list of the vendor
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: followerId },
+        { $pull: { following: vendorId } },
+        { new: true }
+      )
+
+      // remove the vendor from the followers list of the user
+      const updatedVendor = await User.findOneAndUpdate(
+        { _id: vendorId },
+        { $pull: { followers: followerId } },
+        { new: true }
+      );
+      return res.status(200).json({ updatedUser, updatedVendor });
+    }
+
+    // add the user to the following list of the vendor
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: followerId },
+      { $push: { following: vendorId } },
+      { new: true }
+    );
+
+    // add the vendor to the followers list of the user 
+    const updatedVendor = await User.findOneAndUpdate(
+      { _id: vendorId },
+      { $push: { followers: followerId } },
+      { new: true }
+    );
+    res.status(200).json({ updatedUser, updatedVendor });
+  } catch (error) {
+    next(error);
+  }
+  
+}
+
+
 export const logoutUser = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(' ')[1];

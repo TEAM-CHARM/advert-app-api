@@ -6,19 +6,21 @@ const advertSchema = new Schema({
 
     description: { type: String, required: true },
 
-    imageURL: { type: String }, 
+    imageUrl: { type: String },
 
     price: { type: Number, required: true },
 
-    category: { type: Schema.Types.ObjectId, ref: 'Category', required: true }, 
+    category: { type: String, required: true, enum: ["music", "business", "technology", "sports", "arts", "other"] },
 
-    organizer: { type: Schema.Types.ObjectId, ref: 'User', required: true }, 
+    organizer: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 
     location: { type: String, required: true },
 
     date: { type: Date, required: true },
 
-    attendees: [{ type: Schema.Types.ObjectId, ref: 'User' }] 
+    expectedAttendees: { type: Number, required: true },    
+
+    attendees: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
 
