@@ -10,7 +10,7 @@ export const createUser = async (req, res, next) => {
     return res.status(422).json({ error: "Validation Failed", details: error.details });
   }
 
-  const { name, email, password } = value;
+  const { name, email, password, ...rest } = value;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -22,11 +22,19 @@ export const createUser = async (req, res, next) => {
     const newUser = new User({
       name,
       email,
+      ...rest,
       password: hashedPassword,
     });
 
     const user = await newUser.save();
-    res.status(201).json(user);
+    const token =jwt.sign({
+      id: user._id 
+    },
+    process.env.JWT_SECRET,{
+      expiresIn: "1d"
+    }
+  )
+    res.status(201).json({token,user});
   } catch (error) {
     next(error);
   }
@@ -58,12 +66,13 @@ export const loginUser = async (req, res, next) => {
     });
     const response = {
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        vendor: user.vendor,
-      }
+      user
+      // : {
+      //   id: user._id,
+      //   name: user.name,
+      //   email: user.email,
+      //   role: user.role,
+      // }
     };
     res.status(200).json(response);
   } catch (error) {
