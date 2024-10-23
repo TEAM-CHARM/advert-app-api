@@ -3,12 +3,13 @@ import Joi from "joi";
  export const createAdvertValidator = Joi.object({
     title: Joi.string().required(),
     description: Joi.string().required(),
-    imageURL: Joi.string().required(),
+    imageUrl: Joi.string().required(),
     price: Joi.number().required(),
     category: Joi.string().required(),
     organizer: Joi.string().required(),
     location: Joi.string().required(),
     date: Joi.date().required(),
+    expectedAttendees: Joi.number().required(), 
     attendees: Joi.array().items(Joi.string()),
   });
 

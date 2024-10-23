@@ -23,7 +23,7 @@ export const createAdvert = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-  };
+};
 
     export const getAllAdverts = async (req, res, next) => {
        try {
@@ -37,8 +37,8 @@ export const createAdvert = async (req, res, next) => {
          res.status(200).json(adverts);
        } catch (error) {
         next(error);
-       }
     }
+}
 
     export const getAdvert = async (req, res, next) => {
         try {
