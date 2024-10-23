@@ -16,11 +16,12 @@ import Joi from "joi";
   export const updateAdvertValidator = Joi.object({
     title: Joi.string(),
     description: Joi.string(),
-    imageURL: Joi.string(),
+    imageUrl: Joi.string(),
     price: Joi.number(),
     category: Joi.string(),
     organizer: Joi.string(),
     location: Joi.string(),
     date: Joi.date(),
+    expectedAttendees: Joi.number(), 
     attendees: Joi.array().items(Joi.string()),
   });
