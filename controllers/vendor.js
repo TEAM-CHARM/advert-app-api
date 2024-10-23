@@ -8,7 +8,6 @@ export const vendorAds = async (req, res, next) => {
         console.log("vendor---->", vendor);
 
         const ads = await Advert.find({ organizer: vendor._id });
-        console.log("ads---->", ads.length);
         res.status(200).json(ads);
     } catch (error) {
         next(error);

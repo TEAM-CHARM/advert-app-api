@@ -35,7 +35,7 @@ export const getAllAdverts = async (req, res, next) => {
             .find(JSON.parse(filter))
             .limit(limit)
             .skip(skip)
-        //Retunn response //
+        //Return response //
         res.status(200).json(adverts);
     } catch (error) {
         next(error);
@@ -113,19 +113,16 @@ export const getSummary = async (req, res, next) => {
         ]);
 
         // Fetch upcoming adverts (adverts with future dates, sorted by closest date)
-        const upcomingAdverts = await Advert.find({
-            eventDate: { $gt: new Date() } // Filter adverts with future event dates
-        })
-            .sort({ eventDate: 1 }) // Sort by event date (ascending, closest date first)
-            .limit(10); // Limit to 10
+        const upcomingAdverts = await Advert.aggregate([
+            { $sample: { size: 10 } }, // Randomly pick 10 adverts
+        ]);
 
         // Fetch today's adverts (adverts posted today)
-        const todaysAdverts = await Advert.find({
-            createdAt: { $gte: startOfDay, $lte: endOfDay } // Posted between start and end of today
-        })
-            .limit(10); // Limit to 10
+        const todaysAdverts = await Advert.aggregate([
+            { $sample: { size: 10 } }, // Randomly pick 10 adverts
+        ]);
 
-        // Return all categories in one response
+        // Return all categories in one response,
         res.status(200).json({
             trending: trendingAdverts,
             upcoming: upcomingAdverts,
