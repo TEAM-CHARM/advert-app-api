@@ -107,28 +107,46 @@ export const getSummary = async (req, res, next) => {
         const startOfDay = new Date(today.setHours(0, 0, 0, 0));
         const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
-        // Fetch trending adverts (randomize results)
-        const trendingAdverts = await Advert.aggregate([
-            { $sample: { size: 10 } }, // Randomly pick 10 adverts
-        ]);
+        // Fetch trending adverts (randomly pick 10 adverts)
+        const trendingAdverts = await Advert.aggregate([{ $sample: { size: 10 } }]);
 
-        // Fetch upcoming adverts (adverts with future dates, sorted by closest date)
+        // Fetch upcoming adverts
         const upcomingAdverts = await Advert.aggregate([
-            { $sample: { size: 10 } }, // Randomly pick 10 adverts
+            { $match: { date: { $gte: new Date() } } },
+            { $sort: { date: 1 } },
+            { $limit: 10 }
         ]);
 
-        // Fetch today's adverts (adverts posted today)
+        // Fetch today's adverts
         const todaysAdverts = await Advert.aggregate([
-            { $sample: { size: 10 } }, // Randomly pick 10 adverts
+            { $match: { date: { $gte: startOfDay, $lte: endOfDay } } },
+            { $sort: { date: -1 } },
+            { $limit: 10 }
         ]);
 
-        // Return all categories in one response,
+        // Apply toJSON-like transformation manually
+        const transformAdvert = (advert) => {
+            // Remove unwanted fields
+            const { _id, __v, ...rest } = advert;
+            return {
+                ...rest,
+                id: _id // Rename _id to id, as an example
+            };
+        };
+
+        // Transform each advert result
+        const transformedTrendingAdverts = trendingAdverts.map(transformAdvert);
+        const transformedUpcomingAdverts = upcomingAdverts.map(transformAdvert);
+        const transformedTodaysAdverts = todaysAdverts.map(transformAdvert);
+
+        // Return the transformed results
         res.status(200).json({
-            trending: trendingAdverts,
-            upcoming: upcomingAdverts,
-            today: todaysAdverts
+            trending: transformedTrendingAdverts,
+            upcoming: transformedUpcomingAdverts,
+            today: transformedTodaysAdverts
         });
     } catch (error) {
         next(error);
     }
 };
+
