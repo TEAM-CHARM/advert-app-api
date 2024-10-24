@@ -33,6 +33,7 @@ export const getAllAdverts = async (req, res, next) => {
         //Fetch Adverts from the database //
         const adverts = await Advert
             .find(JSON.parse(filter))
+            .populate('organizer')
             .limit(limit)
             .skip(skip)
         //Return response //
@@ -45,7 +46,7 @@ export const getAllAdverts = async (req, res, next) => {
 export const getAdvert = async (req, res, next) => {
     try {
         // fetch advert from the database 
-        const advert = await Advert.findById(req.params.id);
+        const advert = await Advert.findById(req.params.id).populate('organizer');
         if (!advert) {
             return res.status(404).json({ error: 'Advert not found' });
         }
@@ -89,7 +90,7 @@ export const deleteAdvert = async (req, res, next) => {
     try {
         const advert = await Advert.findOneAndDelete({
             _id: req.params.id,
-            user: req.auth.id
+            organizer: req.auth.id
 
         })
         if (!advert) {
