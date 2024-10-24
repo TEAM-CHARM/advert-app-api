@@ -12,7 +12,7 @@ const advertSchema = new Schema({
 
     price: { type: Number, required: true },
 
-    category: { type: String, required: true, enum: ["music", "business", "technology", "sports", "arts", "other"] },
+    category: { type: String, required: true, enum: ["music", "business", "technology", "sports", "arts", "top", "other"] },
 
     organizer: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 
