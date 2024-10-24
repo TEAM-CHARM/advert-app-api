@@ -29,14 +29,15 @@ export const updateVendorAd = async (req, res, next) => {
 
 export const deleteVendorAd = async (req, res, next) => {
     try {
-       const addToDelete = await Advert.findById(req.params.id);
-       //compare the ids of the addToDelete.organizer and req.auth.id
-       if (addToDelete.organizer.toString() !== req.auth.id) {
-           return res.status(401).json({ message: 'Unauthorized' });
-       }
-      console.log("addToDelete---->",addToDelete);
-       await Advert.findByIdAndDelete(addToDelete._id);
-       res.status(200).json({message: 'Advert deleted successfully'});
+        const addToDelete = await Advert.findById(req.params.id);
+        console.log("addToDelete---->", addToDelete);
+        //compare the ids of the addToDelete.organizer and req.auth.id
+        if (addToDelete.organizer.toString() !== req.auth.id) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+        console.log("addToDelete---->", addToDelete);
+        await Advert.findByIdAndDelete(addToDelete._id);
+        res.status(200).json({ message: 'Advert deleted successfully' });
     } catch (error) {
         next(error);
     }
