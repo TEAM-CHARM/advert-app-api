@@ -1,7 +1,32 @@
 import { User } from "../models/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import axios from "axios";
 import { createUserValidator, loginUserValidator, updateUserValidator } from "../validators/user.js";
+
+
+//Function to send SMS
+const sendSMS =async (businessName,businessPhone)=>{
+  const clientId = process.env.clientID;
+  const clientSecret = process.env.clientSecret;
+  const from = process.env.senderID;
+  const content = `
+Welcome to Evently, ${businessName}!\n
+Thank you for joining Evently, Now you can connect with thousands of customers in just a few clicks.\n
+We're excited to help you grow and succeed in the world of event promotion!
+— The Evently Team
+  `;
+   const url = `https://smsc.hubtel.com/v1/messages/send?clientid=${clientId}&clientsecret=${clientSecret}&from=${from}&to=${businessPhone}&content=${encodeURIComponent(
+     content
+   )}`;
+    try {
+      const response = await axios.get(url);
+      console.log("SMS Response:", response.data); // Log the response for debugging
+    } catch (error) {
+      console.error("Error sending SMS:", error);
+    }
+
+}
 
 export const createUser = async (req, res, next) => {
   const { error, value } = createUserValidator.validate(req.body);
@@ -10,38 +35,45 @@ export const createUser = async (req, res, next) => {
     return res.status(422).json({ error: "Validation Failed", details: error.details });
   }
 
-  const { name, email, password, ...rest } = value;
+  const { name, email, password,businessName, businessPhone, ...rest } = value;
 
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: "User with this email already exists" });
+      return res
+        .status(409)
+        .json({ message: "User with this email already exists" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
       name,
       email,
+      businessName, // Store business name
+      businessPhone,
       ...rest,
       password: hashedPassword,
     });
 
     const user = await newUser.save();
-    const token =jwt.sign({
-      id: user._id 
-    },
-    process.env.JWT_SECRET,{
-      expiresIn: "1d"
+    const token = jwt.sign(
+      {
+        id: user._id,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+    // Send SMS to the vendor after successful signup
+    if (businessPhone && businessName) {
+      await sendSMS(businessName, businessPhone);
     }
-  )
-    res.status(201).json({token,user});
+    res.status(201).json({ token, user });
   } catch (error) {
     next(error);
   }
 };
-
-
-
 
 
 export const loginUser = async (req, res, next) => {
