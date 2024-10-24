@@ -20,6 +20,7 @@ const advertSchema = new Schema({
 
     date: { type: Date, required: true },
 
+
     expectedAttendees: { type: Number, required: true },    
 
     attendees: [{ type: Schema.Types.ObjectId, ref: 'User' }]
