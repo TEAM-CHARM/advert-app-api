@@ -117,6 +117,7 @@ export const getProfile = async (req, res, next) => {
   }
 };
 
+
 export const updateProfile = async (req, res, next) => {
   try {
     const { error, value } = updateUserValidator.validate({
@@ -128,11 +129,22 @@ export const updateProfile = async (req, res, next) => {
       return res.status(422).json({ error: 'Validation failed', details: error.details });
     }
 
-    const user = await User.findByIdAndUpdate(req.auth.id, value, { new: true });
+const user = await User.findById(req.auth.id);
+
+    // Check if the user is updating to become a vendor
+    const isBecomingVendor = user.role !== "vendor" && value.role === "vendor";
+    
+    // Update user profile
+    const updatedUser = await User.findByIdAndUpdate(req.auth.id, value, { new: true });
+
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
+     // Send SMS only if the user has become a vendor
+    if (isBecomingVendor && updatedUser.businessPhone && updatedUser.businessName) {
+      await sendSMS(updatedUser.businessName, updatedUser.businessPhone);
+    }
     const response = {
       token,
       user
