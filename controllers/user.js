@@ -132,7 +132,7 @@ export const updateProfile = async (req, res, next) => {
     const oldUser = await User.findById(req.auth.id);
 
     // Check if the user is updating to become a vendor
-    const isBecomingVendor = oldUser.role !== "vendor" && value.role === "vendor";
+    // const isBecomingVendor = oldUser.role !== "vendor" && value.role === "vendor";
 
     // Update user profile
     const user = await User.findByIdAndUpdate(req.auth.id, value, { new: true });
@@ -142,14 +142,14 @@ export const updateProfile = async (req, res, next) => {
       expiresIn: "1d",
     });
     //  // Send SMS only if the user has become a vendor
-    if (isBecomingVendor && updatedUser.businessPhone && updatedUser.businessName) {
-      await sendSMS(updatedUser.businessName, updatedUser.businessPhone);
-    }
+    // if (isBecomingVendor && updatedUser.businessPhone && updatedUser.businessName) {
+    //   await sendSMS(updatedUser.businessName, updatedUser.businessPhone);
+    // }
     const response = {
       token,
       user
     };
-    res.status(200).json(response);
+    return res.status(200).json(response);
 
   } catch (error) {
     next(error);
