@@ -20,7 +20,14 @@ export const updateVendorAd = async (req, res, next) => {
         if (error) {
             return res.status(422).json({ error: 'Validation failed', details: error.details });
         }
+        const addToUpdate = await Advert.findById(req.params.id);
+        console.log("addToUpdate---->", addToUpdate);
+        //compare the ids of the addToUpdate.organizer and req.auth.id   
+        if (addToUpdate.organizer.toString() !== req.auth.id) {
+            return res.status(401).json({ message: 'Unauthorized' });   
+        }
         const updatedAd = await Advert.findByIdAndUpdate(req.params.id, value, { new: true });
+
         res.status(200).json(updatedAd);
     } catch (error) {
         next(error);
