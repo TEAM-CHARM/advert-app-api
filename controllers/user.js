@@ -138,7 +138,7 @@ export const updateProfile = async (req, res, next) => {
     const user = await User.findByIdAndUpdate(req.auth.id, value, { new: true });
 
 
-    const token = jwt.sign({ id: oldUser._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
     //  // Send SMS only if the user has become a vendor
