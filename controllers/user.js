@@ -6,7 +6,7 @@ import { createUserValidator, loginUserValidator, updateUserValidator } from "..
 
 
 //Function to send SMS
-const sendSMS =async (businessName,businessPhone)=>{
+const sendSMS = async (businessName, businessPhone) => {
   const clientId = process.env.clientID;
   const clientSecret = process.env.clientSecret;
   const from = process.env.senderID;
@@ -16,15 +16,15 @@ Thank you for joining Evently, Now you can connect with thousands of customers i
 We're excited to help you grow and succeed in the world of event promotion!
 — The Evently Team
   `;
-   const url = `https://smsc.hubtel.com/v1/messages/send?clientid=${clientId}&clientsecret=${clientSecret}&from=${from}&to=${businessPhone}&content=${encodeURIComponent(
-     content
-   )}`;
-    try {
-      const response = await axios.get(url);
-      console.log("SMS Response:", response.data); // Log the response for debugging
-    } catch (error) {
-      console.error("Error sending SMS:", error);
-    }
+  const url = `https://smsc.hubtel.com/v1/messages/send?clientid=${clientId}&clientsecret=${clientSecret}&from=${from}&to=${businessPhone}&content=${encodeURIComponent(
+    content
+  )}`;
+  try {
+    const response = await axios.get(url);
+    console.log("SMS Response:", response.data); // Log the response for debugging
+  } catch (error) {
+    console.error("Error sending SMS:", error);
+  }
 
 }
 
@@ -35,7 +35,7 @@ export const createUser = async (req, res, next) => {
     return res.status(422).json({ error: "Validation Failed", details: error.details });
   }
 
-  const { name, email, password,businessName, businessPhone, ...rest } = value;
+  const { name, email, password, businessName, businessPhone, ...rest } = value;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -129,11 +129,11 @@ export const updateProfile = async (req, res, next) => {
       return res.status(422).json({ error: 'Validation failed', details: error.details });
     }
 
-const user = await User.findById(req.auth.id);
+    const user = await User.findById(req.auth.id);
 
     // Check if the user is updating to become a vendor
     const isBecomingVendor = user.role !== "vendor" && value.role === "vendor";
-    
+
     // Update user profile
     const updatedUser = await User.findByIdAndUpdate(req.auth.id, value, { new: true });
 
@@ -141,13 +141,13 @@ const user = await User.findById(req.auth.id);
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
-     // Send SMS only if the user has become a vendor
+    //  // Send SMS only if the user has become a vendor
     if (isBecomingVendor && updatedUser.businessPhone && updatedUser.businessName) {
       await sendSMS(updatedUser.businessName, updatedUser.businessPhone);
     }
     const response = {
       token,
-      user
+      updatedUser
     };
     res.status(200).json(response);
 
@@ -160,12 +160,12 @@ export const followVendor = async (req, res, next) => {
   const followerId = req.auth.id;
   const vendorId = req.body.vendorId;
   try {
-    const vendor = await User.findOneAndUpdate(vendorId, ); //find the vendor to be followed
+    const vendor = await User.findOneAndUpdate(vendorId,); //find the vendor to be followed
 
     // check if the user is already following the vendor
     const isFollowing = await User.findOne({
       $and: [
-        { $or: [{ followers: followerId }, ] },
+        { $or: [{ followers: followerId },] },
         // { $or: [{ followers: vendorId },] },
       ],
     });
@@ -204,7 +204,7 @@ export const followVendor = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-  
+
 }
 
 
