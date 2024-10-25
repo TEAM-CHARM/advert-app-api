@@ -33,7 +33,6 @@ export const getAllAdverts = async (req, res, next) => {
         //Fetch Adverts from the database //
         const adverts = await Advert
             .find(JSON.parse(filter))
-            .populate('organizer')
             .limit(limit)
             .skip(skip)
         //Return response //
