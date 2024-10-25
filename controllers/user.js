@@ -129,16 +129,16 @@ export const updateProfile = async (req, res, next) => {
       return res.status(422).json({ error: 'Validation failed', details: error.details });
     }
 
-    const user = await User.findById(req.auth.id);
+    const oldUser = await User.findById(req.auth.id);
 
     // Check if the user is updating to become a vendor
-    const isBecomingVendor = user.role !== "vendor" && value.role === "vendor";
+    const isBecomingVendor = oldUser.role !== "vendor" && value.role === "vendor";
 
     // Update user profile
-    const updatedUser = await User.findByIdAndUpdate(req.auth.id, value, { new: true });
+    const user = await User.findByIdAndUpdate(req.auth.id, value, { new: true });
 
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: oldUser._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
     //  // Send SMS only if the user has become a vendor
@@ -147,7 +147,7 @@ export const updateProfile = async (req, res, next) => {
     }
     const response = {
       token,
-      updatedUser
+      user
     };
     res.status(200).json(response);
 
